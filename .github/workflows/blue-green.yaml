@@ -39,7 +39,6 @@ jobs:
       - name: Switch Traffic to green
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
-          service/application-lb-service patched
 
       - name: Cleanup Old Deployment
         run: |
