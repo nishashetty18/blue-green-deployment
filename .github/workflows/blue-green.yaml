@@ -34,7 +34,7 @@ jobs:
 
       - name: Verify Green Deployment
         run: |
-          kubectl rollout status deployment/myapp-deployment-green --timeout=60s || exit 0
+          kubectl rollout status deployment/myapp-deployment-green --timeout=60s
 
       - name: Switch Traffic to Green if successful
         if: success()
