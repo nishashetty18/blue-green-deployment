@@ -47,7 +47,6 @@ jobs:
           else
             echo "Green deployment successful."
             echo "RESULT=stable" >> $GITHUB_ENV
-          
         continue-on-error: true  # Allows the workflow to continue even if this step fails
 
       - name: Switch Traffic to Green and delete old deployment
@@ -59,11 +58,9 @@ jobs:
       - name: Switch Traffic to Blue
         if: ${{ env.RESULT == 'unstable' }}  # Run cleanup if green deployment failed
         run: |
-          run: |
           kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
-          
 
       - name: Run the Application for 15 Seconds
         run: |
-          timeout 15s minikube service application-lb-service
-
+          sleep 15
+          minikube service application-lb-service
