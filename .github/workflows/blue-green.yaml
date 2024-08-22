@@ -1,4 +1,4 @@
-name: Debugging Workflow
+name: Runner Health Check
 
 on:
   push:
@@ -6,29 +6,16 @@ on:
       - main
 
 jobs:
-  debug:
+  check:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Print system info
+      - name: Check Runner Status
         run: |
-          echo "System Information"
+          echo "Checking system info"
           uname -a
-          lsb_release -a
-
-      - name: Debug Docker
-        run: |
+          df -h
+          free -m
+          echo "Docker version"
           docker --version
           docker info
-
-      - name: Debug Minikube
-        run: |
-          minikube version
-          minikube status
-
-      - name: Print environment variables
-        run: |
-          printenv
