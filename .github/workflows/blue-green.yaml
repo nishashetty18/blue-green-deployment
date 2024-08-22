@@ -40,8 +40,6 @@ jobs:
 
       - name: Set Deployment Verification Status
         id: set_status
-              - name: Set Deployment Verification Status
-        id: set_status
         run: |
           if [ $? -eq 0 ]; then
             echo "Green deployment successful."
