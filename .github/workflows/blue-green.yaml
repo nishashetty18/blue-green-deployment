@@ -33,16 +33,26 @@ jobs:
           kubectl apply -f kubernets_yamls/green_version.yaml
 
       - name: Verify Green Deployment
+        id: verify-green
         run: |
-          kubectl rollout status deployment/myapp-deployment-green
+          kubectl rollout status deployment/myapp-deployment-green --timeout=60s
 
-      - name: Switch Traffic to green
+      - name: Switch Traffic to Green (If Deployment Succeeds)
+        if: success()  # Only run if the previous step succeeded
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
 
       - name: Cleanup Old Deployment
+        if: success()  # Only run if the green deployment succeeds
         run: |
           kubectl delete deployment myapp-deployment-blue
+
+      - name: Rollback to Blue (If Green Deployment Fails)
+        if: failure()  # Only run if the green deployment fails
+        run: |
+          kubectl rollout undo deployment/myapp-deployment-blue
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
+
       - name: Run the application
         run: |
           minikube service application-lb-service
