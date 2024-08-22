@@ -36,38 +36,36 @@ jobs:
         id: verify_green
         run: |
           kubectl rollout status deployment/myapp-deployment-green
-        continue-on-error: true  # Allows the workflow to continue if this step fails
+        continue-on-error: true
 
       - name: Set Deployment Verification Status
         id: set_status
         shell: pwsh
         run: |
-          if ($env:GITHUB_STEP_SUMMARY -eq "failure") {
-            Write-Output "Green deployment failed. Continuing with blue deployment."
-            $env:RESULT = "unstable"
-          } else {
+          if ($LASTEXITCODE -eq 0) {
             Write-Output "Green deployment successful."
             $env:RESULT = "stable"
+          } else {
+            Write-Output "Green deployment failed. Continuing with blue deployment."
+            $env:RESULT = "unstable"
           }
-          Write-Output "RESULT=$env:RESULT" >> $env:GITHUB_ENV
-        continue-on-error: true  # Allows the workflow to continue even if this step fails
+          Write-Output "RESULT=$env:RESULT" | Out-File -Append -FilePath $env:GITHUB_ENV
 
       - name: Debug RESULT Variable
         run: |
           echo "RESULT is ${{ env.RESULT }}"
 
       - name: Switch Traffic to Green and delete old deployment
-        if: ${{ env.RESULT == 'stable' }}  # Only run if green deployment verification succeeded
+        if: ${{ env.RESULT == 'stable' }}
         run: |
           kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
           kubectl delete deployment myapp-deployment-blue
 
       - name: Switch Traffic to Blue
-        if: ${{ env.RESULT == 'unstable' }}  # Run cleanup if green deployment failed
+        if: ${{ env.RESULT == 'unstable' }}
         run: |
           kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
 
       - name: Run the Application for 15 Seconds
         run: |
-          sleep 15
-          minikube service application-lb-service
+          timeout 15s minikube service application-lb-service
