@@ -40,13 +40,16 @@ jobs:
 
       - name: Set Deployment Verification Status
         id: set_status
+        shell: pwsh
         run: |
-          if [ "${{ steps.verify_green.outcome }}" == "failure" ]; then
-            echo "Green deployment failed. Continuing with blue deployment."
-            echo "RESULT=unstable" >> $GITHUB_ENV
-          else
-            echo "Green deployment successful."
-            echo "RESULT=stable" >> $GITHUB_ENV
+          if ($env:GITHUB_STEP_SUMMARY -eq "failure") {
+            Write-Output "Green deployment failed. Continuing with blue deployment."
+            $env:RESULT = "unstable"
+          } else {
+            Write-Output "Green deployment successful."
+            $env:RESULT = "stable"
+          }
+          Write-Output "RESULT=$env:RESULT" >> $env:GITHUB_ENV
         continue-on-error: true  # Allows the workflow to continue even if this step fails
 
       - name: Switch Traffic to Green and delete old deployment
