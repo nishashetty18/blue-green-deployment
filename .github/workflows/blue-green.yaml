@@ -30,7 +30,7 @@ jobs:
 
       - name: Apply Green Deployment
         run: |
-          kubectl apply -f green_version.yaml
+          kubectl apply -f kubernets_yamls/green_version.yaml
 
       - name: Verify Green Deployment
         run: |
