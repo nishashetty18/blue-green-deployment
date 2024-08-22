@@ -1,4 +1,4 @@
-name: Runner Health Check
+name: Blue-Green Deployment
 
 on:
   push:
@@ -6,20 +6,40 @@ on:
       - main
 
 jobs:
-  check:
-    runs-on: self-hosted
+  deploy:
+    runs-on: self-hosted  
 
     steps:
-      - name: Check Runner Status
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Minikube
         run: |
-          echo "Checking system info"
-          uname -a
-          df -h
-          free -m
-          echo "Docker version"
-          docker --version
-          docker info
+          minikube start --driver=none
+          kubectl config use-context minikube
 
+      - name: Load Docker images
+        run: |
+          minikube image load docker.io/library/blue_env:latest
+          minikube image load docker.io/library/green_env:latest
 
+      - name: Apply Blue Deployment
+        run: |
+          kubectl apply -f blue_version.yaml
+          kubectl apply -f service.yaml
 
-          
+      - name: Apply Green Deployment
+        run: |
+          kubectl apply -f green_version.yaml
+
+      - name: Verify Green Deployment
+        run: |
+          kubectl rollout status deployment/myapp-deployment-green
+
+      - name: Switch Traffic to green
+        run: |
+          kubectl patch service application-lb-service -p '{"spec":{"selector":{"app":"myapp","version":"green"}}}'
+
+      - name: Cleanup Old Deployment
+        run: |
+          kubectl delete deployment myapp-deployment-blue
