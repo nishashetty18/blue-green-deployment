@@ -1,4 +1,4 @@
-name: Blue-Green Deployment
+name: Debugging Workflow
 
 on:
   push:
@@ -6,40 +6,29 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: self-hosted  
+  debug:
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Minikube
+      - name: Print system info
         run: |
-          minikube start --driver=none
-          kubectl config use-context minikube
+          echo "System Information"
+          uname -a
+          lsb_release -a
 
-      - name: Load Docker images
+      - name: Debug Docker
         run: |
-          minikube image load docker.io/library/blue_env:latest
-          minikube image load docker.io/library/green_env:latest
+          docker --version
+          docker info
 
-      - name: Apply Blue Deployment
+      - name: Debug Minikube
         run: |
-          kubectl apply -f blue_version.yaml
-          kubectl apply -f service.yaml
+          minikube version
+          minikube status
 
-      - name: Apply Green Deployment
+      - name: Print environment variables
         run: |
-          kubectl apply -f green_version.yaml
-
-      - name: Verify Green Deployment
-        run: |
-          kubectl rollout status deployment/myapp-deployment-green
-
-      - name: Switch Traffic to green
-        run: |
-          kubectl patch service application-lb-service -p '{"spec":{"selector":{"app":"myapp","version":"green"}}}'
-
-      - name: Cleanup Old Deployment
-        run: |
-          kubectl delete deployment myapp-deployment-blue
+          printenv
