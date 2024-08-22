@@ -57,4 +57,3 @@ jobs:
       - name: Run the application
         run: |
           minikube service application-lb-service
-s
