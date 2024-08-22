@@ -39,13 +39,13 @@ jobs:
       - name: Switch Traffic to Green if successful
         if: success()
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
 
       - name: Switch Traffic to Blue if green fails
         if: failure()
         run: |
           echo "Green deployment failed, continuing with blue deployment."
-          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
 
       - name: Cleanup Old Deployment if Green succeeded
         if: success()
