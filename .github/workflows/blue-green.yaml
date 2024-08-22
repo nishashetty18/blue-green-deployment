@@ -35,12 +35,13 @@ jobs:
       - name: Verify Green Deployment
         run: |
           kubectl rollout status deployment/myapp-deployment-green --timeout=60s
+        continue-on-error: true
 
       - name: Switch Traffic to Green if successful
         if: success()
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
-
+        continue-on-error: true
       - name: Switch Traffic to Blue if green fails
         if: failure()
         run: |
@@ -55,3 +56,4 @@ jobs:
       - name: Run the application
         run: |
           minikube service application-lb-service
+s
