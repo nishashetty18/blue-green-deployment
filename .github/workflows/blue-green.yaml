@@ -33,27 +33,33 @@ jobs:
           kubectl apply -f kubernets_yamls/green_version.yaml
 
       - name: Verify Green Deployment
+        id: verify_green
         run: |
-          kubectl rollout status deployment/myapp-deployment-green --timeout=60s
-        continue-on-error: true
+          kubectl rollout status deployment/myapp-deployment-green
+        continue-on-error: true  # Allows the workflow to continue if this step fails
 
-      - name: Switch Traffic to Green if successful
-        if: success()
+      - name: Set Deployment Verification Status
+        id: set_status
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
-        continue-on-error: true
+          if [ "${{ steps.verify_green.outcome }}" == "failure" ]; then
+            echo "Green deployment failed. Continuing with blue deployment."
+            echo "RESULT=unstable" >> $GITHUB_ENV
+          else
+            echo "Green deployment successful."
+            echo "RESULT=stable" >> $GITHUB_ENV
+          fi
+        continue-on-error: true  # Allows the workflow to continue even if this step fails
 
-      - name: Switch Traffic to Blue if green fails
-        if: failure()
+      - name: Switch Traffic to Green
+        if: ${{ env.RESULT == 'stable' }}  # Only run if green deployment verification succeeded
         run: |
-          echo "Green deployment failed, continuing with blue deployment."
-          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
 
-      - name: Cleanup Old Deployment if Green succeeded
-        if: success()
+      - name: Cleanup Old Deployment
+        if: ${{ env.RESULT == 'unstable' }}  # Run cleanup if green deployment failed
         run: |
           kubectl delete deployment myapp-deployment-blue
 
-      - name: Run the application
+      - name: Run the Application
         run: |
           minikube service application-lb-service
