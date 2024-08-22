@@ -19,3 +19,7 @@ jobs:
           echo "Docker version"
           docker --version
           docker info
+
+
+
+          
