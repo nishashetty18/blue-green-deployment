@@ -42,6 +42,7 @@ jobs:
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
         continue-on-error: true
+
       - name: Switch Traffic to Blue if green fails
         if: failure()
         run: |
