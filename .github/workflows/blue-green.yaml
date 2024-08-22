@@ -40,16 +40,14 @@ jobs:
 
       - name: Set Deployment Verification Status
         id: set_status
-        shell: pwsh
         run: |
-          if ($LASTEXITCODE -eq 0) {
-            Write-Output "Green deployment successful."
-            $env:RESULT = "stable"
-          } else {
-            Write-Output "Green deployment failed. Continuing with blue deployment."
-            $env:RESULT = "unstable"
-          }
-          Write-Output "RESULT=$env:RESULT" >> $env:GITHUB_ENV
+          if [ $? -eq 0 ]; then
+            echo "Green deployment successful."
+            echo "RESULT=stable" >> $GITHUB_ENV
+          else
+            echo "Green deployment failed. Continuing with blue deployment."
+            echo "RESULT=unstable" >> $GITHUB_ENV
+          fi
 
       - name: Debug RESULT Variable
         run: |
@@ -68,5 +66,4 @@ jobs:
 
       - name: Run the Application for 15 Seconds
         run: |
-          Start-Sleep -Seconds 15
-          minikube service application-lb-service
+          timeout 15s minikube service application-lb-service
