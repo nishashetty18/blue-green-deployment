@@ -1,0 +1,45 @@
+name: Blue-Green Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # Use a self-hosted runner with Minikube
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Minikube
+        run: |
+          minikube start --driver=none
+          kubectl config use-context minikube
+
+      - name: Load Docker images
+        run: |
+          minikube image load docker.io/library/blue_env:latest
+          minikube image load docker.io/library/green_env:latest
+
+      - name: Apply Blue Deployment
+        run: |
+          kubectl apply -f blue_version.yaml
+          kubectl apply -f service.yaml
+
+      - name: Apply Green Deployment
+        run: |
+          kubectl apply -f green_version.yaml
+
+      - name: Verify Green Deployment
+        run: |
+          kubectl rollout status deployment/myapp-deployment-green
+
+      - name: Switch Traffic to green
+        run: |
+          kubectl patch service application-lb-service -p '{"spec":{"selector":{"app":"myapp","version":"green"}}}'
+
+      - name: Cleanup Old Deployment
+        run: |
+          kubectl delete deployment myapp-deployment-blue

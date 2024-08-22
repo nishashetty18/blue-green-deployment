@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment-blue
+  labels:
+    app: myapp-deployment-blue
+spec:
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+        version: blue
+    spec:
+      containers:
+        - name: myapp-container
+          image: docker.io/library/blue_env:latest
+          imagePullPolicy: Never
+  replicas: 1
+  selector:
+    matchLabels:
+      version: blue
+      app: myapp
