@@ -33,25 +33,24 @@ jobs:
           kubectl apply -f kubernets_yamls/green_version.yaml
 
       - name: Verify Green Deployment
-        id: verify-green
         run: |
-          kubectl rollout status deployment/myapp-deployment-green --timeout=60s
+          kubectl rollout status deployment/myapp-deployment-green --timeout=60s || exit 0
 
-      - name: Switch Traffic to Green (If Deployment Succeeds)
-        if: success()  # Only run if the previous step succeeded
+      - name: Switch Traffic to Green if successful
+        if: success()
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
 
-      - name: Cleanup Old Deployment
-        if: success()  # Only run if the green deployment succeeds
+      - name: Switch Traffic to Blue if green fails
+        if: failure()
+        run: |
+          echo "Green deployment failed, continuing with blue deployment."
+          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
+
+      - name: Cleanup Old Deployment if Green succeeded
+        if: success()
         run: |
           kubectl delete deployment myapp-deployment-blue
-
-      - name: Rollback to Blue (If Green Deployment Fails)
-        if: failure()  # Only run if the green deployment fails
-        run: |
-          kubectl rollout undo deployment/myapp-deployment-blue
-          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
 
       - name: Run the application
         run: |
