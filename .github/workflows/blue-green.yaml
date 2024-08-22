@@ -60,6 +60,7 @@ jobs:
         run: |
           kubectl delete deployment myapp-deployment-blue
 
-      - name: Run the Application
+      - name: Run the Application for 15 Seconds
         run: |
-          minikube service application-lb-service
+          timeout 15s minikube service application-lb-service
+
