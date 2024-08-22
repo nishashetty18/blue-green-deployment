@@ -43,3 +43,6 @@ jobs:
       - name: Cleanup Old Deployment
         run: |
           kubectl delete deployment myapp-deployment-blue
+      - name: Run the application
+        run: |
+          minikube service application-lb-service
