@@ -66,11 +66,15 @@ jobs:
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
 
       - name: Run the Application for 15 Seconds
-        shell: powershell  
+        shell: powershell  # Specify PowerShell as the shell
         run: |
-          Start-Process -NoNewWindow -FilePath "minikube" -ArgumentList "service application-lb-service --url"
-          Start-Sleep -Seconds 15
+        # Start the minikube service in a background job
+        $serviceUrl = minikube service application-lb-service --url
+        Start-Process "cmd.exe" -ArgumentList "/c start $serviceUrl"  # Open the application in the browser
+        Start-Sleep -Seconds 15  # Wait for 15 seconds
 
-      - name: Cleanup Background Task
+      - name: Stop the Application
+        shell: powershell  # Specify PowerShell as the shell
         run: |
-          pkill -f "minikube service application-lb-service"
+        # Find and kill the Minikube process for the service
+        Stop-Process -Name "minikube" -Force
