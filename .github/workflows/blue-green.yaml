@@ -68,13 +68,11 @@ jobs:
       - name: Run the Application for 15 Seconds
         shell: powershell  # Specify PowerShell as the shell
         run: |
-        # Start the minikube service in a background job
-        $serviceUrl = minikube service application-lb-service --url
-        Start-Process "cmd.exe" -ArgumentList "/c start $serviceUrl"  # Open the application in the browser
-        Start-Sleep -Seconds 15  # Wait for 15 seconds
+          $serviceUrl = minikube service application-lb-service --url
+          Start-Process "cmd.exe" -ArgumentList "/c start $serviceUrl"  # Open the application in the browser
+          Start-Sleep -Seconds 15  # Wait for 15 seconds
 
       - name: Stop the Application
         shell: powershell  # Specify PowerShell as the shell
         run: |
-        # Find and kill the Minikube process for the service
-        Stop-Process -Name "minikube" -Force
+          Stop-Process -Name "minikube" -Force
