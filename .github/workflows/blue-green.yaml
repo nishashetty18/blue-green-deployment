@@ -38,6 +38,11 @@ jobs:
           kubectl rollout status deployment/myapp-deployment-green
         continue-on-error: true
 
+      - name: Install PowerShell
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y powershell
+
       - name: Set Deployment Verification Status
         id: set_status
         shell: pwsh
