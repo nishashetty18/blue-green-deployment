@@ -68,9 +68,14 @@ jobs:
       - name: Run the Application for 15 Seconds
         shell: powershell  # Specify PowerShell as the shell
         run: |
+          # Retrieve the Minikube service URL
           $serviceUrl = minikube service application-lb-service --url
-          Start-Process "cmd.exe" -ArgumentList "/c start $serviceUrl"  # Open the application in the browser
-          Start-Sleep -Seconds 15  # Wait for 15 seconds
+          
+          # Open the service URL in the default browser
+          Start-Process $serviceUrl
+          
+          # Wait for 15 seconds
+          Start-Sleep -Seconds 15
 
       - name: Stop the Application
         shell: powershell  # Specify PowerShell as the shell
