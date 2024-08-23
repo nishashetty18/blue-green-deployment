@@ -49,6 +49,7 @@ jobs:
             Write-Output "Green deployment failed. Continuing with blue deployment."
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=unstable"
           }
+          echo "code is ${{LASTEXITCODE}}"
 
       - name: Debug RESULT Variable
         run: |
