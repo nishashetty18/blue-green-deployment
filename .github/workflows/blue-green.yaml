@@ -71,11 +71,10 @@ jobs:
           # Retrieve the Minikube service URL
           $serviceUrl = minikube service application-lb-service 
           
-          # Open the service URL in the default browser
-          Start-Process $serviceUrl
-          
-          # Wait for 15 seconds
-          Start-Sleep -Seconds 15
+          for i in {1..15}; do
+            curl --silent --fail $serviceUrl
+            sleep 1
+          done
 
       - name: Stop the Application
         shell: powershell  # Specify PowerShell as the shell
