@@ -42,7 +42,7 @@ jobs:
         id: set_status
         shell: powershell
         run: |
-          if ("$" -eq 0) {
+          if ($?) {
             Write-Output "Green deployment successful."
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=stable"
           } else {
