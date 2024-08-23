@@ -37,7 +37,7 @@ jobs:
         shell: powershell
         run: |
           try {
-            $result = kubectl rollout status deployment/myapp-deployment-green
+            $result = kubectl rollout status deployment/myapp-deployment-green 
             Write-Output "Deployment Status: $result"
             Write-Output "Exit code: $LASTEXITCODE"
             if ($LASTEXITCODE -eq 0) {
@@ -51,7 +51,7 @@ jobs:
             Write-Output "Error occurred: $_"
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=unstable"
           }
-
+        continue-on-error: true
 
 
       - name: Debug RESULT Variable
