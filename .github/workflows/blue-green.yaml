@@ -40,14 +40,15 @@ jobs:
 
       - name: Set Deployment Verification Status
         id: set_status
+        shell: pwsh
         run: |
-          if [ $? -eq 0 ]; then
-            echo "Green deployment successful."
-            echo "RESULT=stable" >> $GITHUB_ENV
-          else
-            echo "Green deployment failed. Continuing with blue deployment."
-            echo "RESULT=unstable" >> $GITHUB_ENV
-          fi
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "Green deployment successful."
+            echo "RESULT=stable" | Out-File -Append -FilePath $env:GITHUB_ENV
+          } else {
+            Write-Output "Green deployment failed. Continuing with blue deployment."
+            echo "RESULT=unstable" | Out-File -Append -FilePath $env:GITHUB_ENV
+          }
 
       - name: Debug RESULT Variable
         run: |
