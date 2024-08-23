@@ -59,22 +59,26 @@ jobs:
         if: ${{ env.RESULT == 'stable' }}
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
+          echo "Application is running on green environment"
           kubectl delete deployment myapp-deployment-blue
+          echo "blue deployment deleted successfully"
 
       - name: Switch Traffic to Blue
         if: ${{ env.RESULT == 'unstable' }}
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
+          echo "Application is running on blue environment"
 
-      - name: Run the Application for 15 Seconds
-        shell: powershell  # Specify PowerShell as the shell
-        run: |
-          powershell -Command "Start-Sleep -Seconds 15; minikube service application-lb-service"
-          Stop-Process -Name "minikube" -Force
-        continue-on-error: true
+
+      #- name: 
+      #  shell: powershell  # Specify PowerShell as the shell
+       # run: |
+       #   powershell -Command "Start-Sleep -Seconds 15; minikube service application-lb-service"
+       #   Stop-Process -Name "minikube" -Force
+        #continue-on-error: true
           
           
-      - name: Stop the Application
-        shell: powershell  # Specify PowerShell as the shell
-        run: |
-          Stop-Process -Name "minikube" -Force
+      #- name: Stop the Application
+        #shell: powershell  # Specify PowerShell as the shell
+        #run: |
+         # Stop-Process -Name "minikube" -Force
