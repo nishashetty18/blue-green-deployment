@@ -68,8 +68,7 @@ jobs:
       - name: Run the Application for 15 Seconds
         shell: powershell  # Specify PowerShell as the shell
         run: |
-          Start-Process -NoNewWindow -FilePath "powershell.exe" -ArgumentList "-Command \"Start-Sleep -Seconds 15; minikube service application-lb-service \""
-
+          powershell -Command "Start-Sleep -Seconds 15; minikube service application-lb-service"
           
           
       - name: Stop the Application
