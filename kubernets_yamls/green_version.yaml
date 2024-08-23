@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: myapp-container
-          image: docker.io/library/green_env:latest
+          image: docker.io/library/gree_env:latest
           imagePullPolicy: Never
   replicas: 1
   selector:
