@@ -42,14 +42,14 @@ jobs:
         id: set_status
         shell: powershell
         run: |
-          if ($LASTEXITCODE -eq 0) {
+          if ("$" -eq 0) {
             Write-Output "Green deployment successful."
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=stable"
           } else {
             Write-Output "Green deployment failed. Continuing with blue deployment."
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=unstable"
           }
-          echo "code is ${{LASTEXITCODE}}"
+          
 
       - name: Debug RESULT Variable
         run: |
