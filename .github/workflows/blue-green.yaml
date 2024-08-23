@@ -69,7 +69,7 @@ jobs:
         shell: powershell  # Specify PowerShell as the shell
         run: |
           # Retrieve the Minikube service URL
-          $serviceUrl = minikube service application-lb-service --url
+          $serviceUrl = minikube service application-lb-service 
           
           # Open the service URL in the default browser
           Start-Process $serviceUrl
