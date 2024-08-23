@@ -35,7 +35,8 @@ jobs:
       - name: Verify Green Deployment
         id: verify_green
         run: |
-          kubectl rollout status deployment/myapp-deployment-green
+          timeout 10s kubectl rollout status deployment/myapp-deployment-green
+
         continue-on-error: true
 
       - name: Set Deployment Verification Status
