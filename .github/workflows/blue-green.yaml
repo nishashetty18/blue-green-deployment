@@ -65,9 +65,11 @@ jobs:
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
 
-      - name: Run and Open Application for 15 Seconds
+      - name: Run the Application for 15 Seconds
         run: |
-          Start-Process -FilePath "minikube" -ArgumentList 'service application-lb-service' -NoNewWindow
-          Start-Process -FilePath "explorer" -ArgumentList (minikube service application-lb-service --url)  # Open the app in the browser
-          Start-Sleep -Seconds 15
+          nohup minikube service application-lb-service --url &
+          sleep 15
 
+      - name: Cleanup Background Task
+        run: |
+          pkill -f "minikube service application-lb-service"
