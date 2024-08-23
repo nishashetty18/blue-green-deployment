@@ -39,17 +39,26 @@ jobs:
 
         continue-on-error: true
 
-      - name: Set Deployment Verification Status
-        id: set_status
+      - name: Verify Green Deployment
+        id: verify_green
         shell: powershell
         run: |
-          if ($LASTEXITCODE -eq 0) {
-            Write-Output "Green deployment successful."
-            Add-Content -Path $env:GITHUB_ENV -Value "RESULT=stable"
-          } else {
-            Write-Output "Green deployment failed. Continuing with blue deployment."
+          try {
+            $result = kubectl rollout status deployment/myapp-deployment-green
+            Write-Output "Deployment Status: $result"
+            Write-Output "Exit code: $LASTEXITCODE"
+            if ($LASTEXITCODE -eq 0) {
+              Write-Output "Green deployment successful."
+              Add-Content -Path $env:GITHUB_ENV -Value "RESULT=stable"
+            } else {
+              Write-Output "Green deployment failed. Continuing with blue deployment."
+              Add-Content -Path $env:GITHUB_ENV -Value "RESULT=unstable"
+            }
+          } catch {
+            Write-Output "Error occurred: $_"
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=unstable"
           }
+
           
 
       - name: Debug RESULT Variable
