@@ -69,6 +69,8 @@ jobs:
         shell: powershell  # Specify PowerShell as the shell
         run: |
           powershell -Command "Start-Sleep -Seconds 15; minikube service application-lb-service"
+          Stop-Process -Name "minikube" -Force
+        continue-on-error: true
           
           
       - name: Stop the Application
