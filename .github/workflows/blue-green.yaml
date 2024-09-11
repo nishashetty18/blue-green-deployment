@@ -75,12 +75,11 @@ jobs:
           echo "Application is running on blue environment"
 
 
-      #- name: 
-      #  shell: powershell  # Specify PowerShell as the shell
-       # run: |
-       #   powershell -Command "Start-Sleep -Seconds 15; minikube service application-lb-service"
-       #   Stop-Process -Name "minikube" -Force
-        #continue-on-error: true
+      - name: Application
+        run: |
+          minikube service application-lb-service"
+        timeout-seconds: 10
+        continue-on-error: true
           
           
       #- name: Stop the Application
