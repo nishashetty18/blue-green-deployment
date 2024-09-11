@@ -78,7 +78,7 @@ jobs:
       - name: Application
         run: |
           minikube service application-lb-service"
-        timeout-seconds: 10
+        timeout-minutes: 1
         continue-on-error: true
           
           
