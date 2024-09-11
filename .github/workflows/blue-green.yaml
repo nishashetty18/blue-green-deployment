@@ -51,6 +51,7 @@ jobs:
             Write-Output "Error occurred: $_"
             Add-Content -Path $env:GITHUB_ENV -Value "RESULT=unstable"
           }
+        timeout-minutes: 1
         continue-on-error: true
 
 
