@@ -55,34 +55,44 @@ jobs:
         timeout-minutes: 1
         continue-on-error: true
 
+
       - name: Debug RESULT Variable
         run: |
           echo "RESULT is ${{ env.RESULT }}"
-  
-  manual_approve:
+  ManualApprove:
     needs: deploy
-    runs-on: self-hosted
-    environment: production  # Make sure you have set this up in GitHub's settings
+    environment:
+      name: approvers
+    runs-on: self-hosted 
     steps:
-      - name: Wait for manual approval
-        run: echo "Manually approved"
-
-      - name: Switch Traffic to Green and Delete Old Deployment
-        if: ${{ env.RESULT == 'stable' }}  # Correct the condition here
+      - name: manual approve
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
+          echo "Manually approved"
+      - name: Switch Traffic to Green and delete old deployment
+        if: ${{ env.RESULT == 'stable' }}
+        run: |
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
           echo "Application is running on green environment"
           kubectl delete deployment myapp-deployment-blue
-          echo "Blue deployment deleted successfully"
+          echo "blue deployment deleted successfully"
 
       - name: Switch Traffic to Blue
-        if: ${{ env.RESULT == 'unstable' }}  # Correct the condition here
+        if: ${{ env.RESULT == 'unstable' }}
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
           echo "Application is running on blue environment"
 
-      - name: Expose Application
+
+      - name: Application
         run: |
           minikube service application-lb-service
         timeout-minutes: 1
         continue-on-error: true
+              
+            
+
+            
+        #- name: Stop the Application
+          #shell: powershell  # Specify PowerShell as the shell
+          #run: |
+         # Stop-Process -Name "minikube" -Force
