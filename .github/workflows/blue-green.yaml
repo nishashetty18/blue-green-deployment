@@ -60,6 +60,7 @@ jobs:
         run: |
           echo "RESULT is ${{ env.RESULT }}"
   wait_for_approval:
+    runs-on: self-hosted
     steps:
       - name: Switch Traffic to Green and delete old deployment
         if: ${{ env.RESULT == 'stable' }}
