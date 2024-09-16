@@ -60,39 +60,39 @@ jobs:
         run: |
           echo "RESULT is ${{ env.RESULT }}"
   ManualApprove:
-  needs: deploy
-  environment:
-    name: approvers
-  runs-on: self-hosted 
-  steps:
-  - name: manual approve
-    run: |
-      echo "Manually approved"
-  - name: Switch Traffic to Green and delete old deployment
-    if: ${{ env.RESULT == 'stable' }}
-    run: |
-      kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
-      echo "Application is running on green environment"
-      kubectl delete deployment myapp-deployment-blue
-      echo "blue deployment deleted successfully"
+    needs: deploy
+    environment:
+      name: approvers
+    runs-on: self-hosted 
+    steps:
+      - name: manual approve
+        run: |
+          echo "Manually approved"
+      - name: Switch Traffic to Green and delete old deployment
+        if: ${{ env.RESULT == 'stable' }}
+        run: |
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
+          echo "Application is running on green environment"
+          kubectl delete deployment myapp-deployment-blue
+          echo "blue deployment deleted successfully"
 
-  - name: Switch Traffic to Blue
-    if: ${{ env.RESULT == 'unstable' }}
-    run: |
-      kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
-      echo "Application is running on blue environment"
+      - name: Switch Traffic to Blue
+        if: ${{ env.RESULT == 'unstable' }}
+        run: |
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
+          echo "Application is running on blue environment"
 
 
-  - name: Application
-    run: |
-      minikube service application-lb-service
-    timeout-minutes: 1
-    continue-on-error: true
-          
-          
+      - name: Application
+        run: |
+          minikube service application-lb-service
+        timeout-minutes: 1
+        continue-on-error: true
+              
+            
 
-          
-      #- name: Stop the Application
-        #shell: powershell  # Specify PowerShell as the shell
-        #run: |
+            
+        #- name: Stop the Application
+          #shell: powershell  # Specify PowerShell as the shell
+          #run: |
          # Stop-Process -Name "minikube" -Force
