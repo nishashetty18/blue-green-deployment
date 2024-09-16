@@ -86,3 +86,5 @@ jobs:
           minikube service application-lb-service
         timeout-minutes: 1
         continue-on-error: true
+
+
