@@ -59,7 +59,8 @@ jobs:
       - name: Debug RESULT Variable
         run: |
           echo "RESULT is ${{ env.RESULT }}"
-
+  wait_for_approval:
+    steps:
       - name: Switch Traffic to Green and delete old deployment
         if: ${{ env.RESULT == 'stable' }}
         run: |
