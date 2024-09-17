@@ -8,8 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    outputs:  # Declare job output
-      deployment_result: ${{ steps.set-result.outputs.deployment_result }}  # Capture the RESULT variable from the steps
+    outputs:  
+      deployment_result: ${{ steps.set-result.outputs.deployment_result }} 
 
     steps:
       - name: Checkout code
@@ -58,7 +58,7 @@ jobs:
         continue-on-error: true
 
       - name: Set RESULT as output for next job
-        id: set-result  # This step sets the RESULT output for the entire job
+        id: set-result  
         run: echo "::set-output name=deployment_result::${{ env.RESULT }}"
 
       - name: Debug RESULT Variable
@@ -66,7 +66,7 @@ jobs:
           echo "RESULT is ${{ env.RESULT }}"
 
   manual_approve:
-    needs: deploy  # This job depends on the deploy job
+    needs: deploy 
     runs-on: self-hosted
     environment: production 
     steps:
@@ -74,7 +74,7 @@ jobs:
         run: echo "Manually approved"
 
       - name: Switch Traffic to Green and Delete Old Deployment
-        if: ${{ needs.deploy.outputs.deployment_result == 'stable' }}  # Use output from deploy job
+        if: ${{ needs.deploy.outputs.deployment_result == 'stable' }} 
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
           echo "Application is running on green environment"
@@ -82,7 +82,7 @@ jobs:
           echo "Blue deployment deleted successfully"
 
       - name: Switch Traffic to Blue
-        if: ${{ needs.deploy.outputs.deployment_result == 'unstable' }}  # Use output from deploy job
+        if: ${{ needs.deploy.outputs.deployment_result == 'unstable' }}  
         run: |
           kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
           echo "Application is running on blue environment"
