@@ -76,7 +76,7 @@ jobs:
       - name: Switch Traffic to Green and Delete Old Deployment
         if: ${{ needs.deploy.outputs.deployment_result == 'stable' }}  # Use output from deploy job
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"green\"}}}'
           echo "Application is running on green environment"
           kubectl delete deployment myapp-deployment-blue
           echo "Blue deployment deleted successfully"
@@ -84,7 +84,7 @@ jobs:
       - name: Switch Traffic to Blue
         if: ${{ needs.deploy.outputs.deployment_result == 'unstable' }}  # Use output from deploy job
         run: |
-          kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
+          kubectl patch service application-lb-service --type=merge -p '{\"spec\": {\"selector\": {\"app\": \"myapp\", \"version\": \"blue\"}}}'
           echo "Application is running on blue environment"
 
       - name: Expose Application
