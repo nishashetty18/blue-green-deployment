@@ -59,7 +59,7 @@ jobs:
 
       - name: Set RESULT as output for next job
         id: set-result  
-         run: echo "deployment_result=${{ env.RESULT }}" >> $GITHUB_OUTPUT
+        run: echo "deployment_result=${{ env.RESULT }}" >> $GITHUB_OUTPUT
 
       - name: Debug RESULT Variable
         run: |
