@@ -83,7 +83,7 @@ jobs:
 
 
   Switching_Traffic:
-    needs: manual_approve
+    needs: [deploy, manual_approve]
     runs-on: self-hosted
     steps:
       - name: Switch Traffic to Green and Delete Old Deployment
