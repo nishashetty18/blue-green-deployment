@@ -59,7 +59,7 @@ jobs:
 
       - name: Set RESULT as output for next job
         id: set-result  
-        run: echo "deployment_result=${{ env.RESULT }}" >> $GITHUB_OUTPUT
+        run:  echo "::set-output name=deployment_result::${{ env.RESULT }}"
 
       - name: Debug RESULT Variable
         run: |
@@ -71,8 +71,20 @@ jobs:
     environment: production 
     steps:
       - name: Wait for manual approval
+        run: echo "Waiting for manual approval..."
+   
+  
+  Confirming_approval:
+    needs: manual_approve
+    runs-on: self-hosted
+    steps:
+      - name: Approved message
         run: echo "Manually approved"
 
+
+  Switching_Traffic:
+    needs: manual_approve
+    runs-on: self-hosted
       - name: Switch Traffic to Green and Delete Old Deployment
         if: ${{ needs.deploy.outputs.deployment_result == 'stable' }} 
         run: |
