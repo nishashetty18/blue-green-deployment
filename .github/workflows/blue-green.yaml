@@ -7,7 +7,9 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  
+    runs-on: self-hosted
+    outputs:  # Declare job output
+      deployment_result: ${{ steps.set-result.outputs.deployment_result }}  # Capture the RESULT variable from the steps
 
     steps:
       - name: Checkout code
@@ -55,20 +57,24 @@ jobs:
         timeout-minutes: 1
         continue-on-error: true
 
+      - name: Set RESULT as output for next job
+        id: set-result  # This step sets the RESULT output for the entire job
+        run: echo "::set-output name=deployment_result::${{ env.RESULT }}"
+
       - name: Debug RESULT Variable
         run: |
           echo "RESULT is ${{ env.RESULT }}"
-  
+
   manual_approve:
-    needs: deploy
+    needs: deploy  # This job depends on the deploy job
     runs-on: self-hosted
-    environment: production  # Make sure you have set this up in GitHub's settings
+    environment: production 
     steps:
       - name: Wait for manual approval
         run: echo "Manually approved"
 
       - name: Switch Traffic to Green and Delete Old Deployment
-        if: ${{ env.RESULT == 'stable' }}  # Correct the condition here
+        if: ${{ needs.deploy.outputs.deployment_result == 'stable' }}  # Use output from deploy job
         run: |
           kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "green"}}}'
           echo "Application is running on green environment"
@@ -76,7 +82,7 @@ jobs:
           echo "Blue deployment deleted successfully"
 
       - name: Switch Traffic to Blue
-        if: ${{ env.RESULT == 'unstable' }}  # Correct the condition here
+        if: ${{ needs.deploy.outputs.deployment_result == 'unstable' }}  # Use output from deploy job
         run: |
           kubectl patch service application-lb-service --type=merge -p '{"spec": {"selector": {"app": "myapp", "version": "blue"}}}'
           echo "Application is running on blue environment"
@@ -86,5 +92,3 @@ jobs:
           minikube service application-lb-service
         timeout-minutes: 1
         continue-on-error: true
-
-
